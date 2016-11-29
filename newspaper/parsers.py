@@ -151,6 +151,7 @@ class Parser(object):
             if n.tail:
                 t = cls.createElement(tag='text', text=n.tail, tail=None)
                 root.insert(idx + 1, t)
+                n.tail = None
         return list(root)
 
     @classmethod
