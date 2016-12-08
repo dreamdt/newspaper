@@ -4,6 +4,7 @@ Holds the code for cleaning out unwanted tags from the lxml
 dom xpath.
 """
 from .utils import ReplaceSequence
+from .text import innerTrim
 
 
 class DocumentCleaner(object):
@@ -144,6 +145,15 @@ class DocumentCleaner(object):
             self.parser.drop_tag(item)
         return doc
 
+    def clean_white_spaces(self, element):
+
+        for child in element.iter():
+            if child.text:
+                child.text = innerTrim(child.text)
+            if child.tail:
+                child.tail = innerTrim(child.tail)
+        return element
+
     def get_flushed_buffer(self, replacement_text, doc):
         return self.parser.textToPara(replacement_text)
 
@@ -177,37 +187,64 @@ class DocumentCleaner(object):
                                          value='yes')
                 next_node = self.parser.nextSibling(next_node)
 
-    def get_replacement_nodes(self, doc, div):
-        replacement_text = []
-        nodes_to_return = []
-        nodes_to_remove = []
+    def get_replacement_nodes(self, div):
+        """
+            Puts the content of div element (text nodes and its inline siblings) inside <p></p>
+        """
+        # list of html inline elements, except <br>
+        inline_elements = [
+            'a', 'abbr', 'acronym', 'b', 'basefont', 'bdo', 'big',
+            'cite', 'code', 'dfn', 'em', 'font', 'i', 'input', 'kbd',
+            'label', 'q', 's', 'samp', 'select', 'small', 'span', 'strike',
+            'strong', 'sub', 'sup', 'textarea', 'tt', 'u', 'var'
+        ]
+        # list of candidates (inline elements and text nodes) to wrap with <p></p> element
+        nodes_to_wrap = []
+        # set this flag, when nodes_to_wrap contains at least one text node
+        text_node_inside = False
+
+        # Remove spaces to avoid empty text nodes
+        self.clean_white_spaces(div)
+
+        # childNodesWithText will wrap all text nodes with <text></text> element
         kids = self.parser.childNodesWithText(div)
+
         for kid in kids:
-            # The node is a <p> and already has some replacement text
-            if self.parser.getTag(kid) == 'p' and len(replacement_text) > 0:
-                new_node = self.get_flushed_buffer(
-                    ''.join(replacement_text), doc)
-                nodes_to_return.append(new_node)
-                replacement_text = []
-                nodes_to_return.append(kid)
-            # The node is a text node
-            elif self.parser.isTextNode(kid):
-                kid_text = self.parser.getText(kid)
-                self.replace_walk_left_right(kid, kid_text, replacement_text,
-                                             nodes_to_remove)
-            else:
-                nodes_to_return.append(kid)
+            inline_or_text = self.parser.getTag(kid) in inline_elements or self.parser.isTextNode(kid)
+            is_last_child = kids[-1] == kid
+            if inline_or_text:
+                if self.parser.isTextNode(kid):
+                    text_node_inside = True
+                nodes_to_wrap.append(kid)
 
-        # flush out anything still remaining
-        if(len(replacement_text) > 0):
-            new_node = self.get_flushed_buffer(''.join(replacement_text), doc)
-            nodes_to_return.append(new_node)
-            replacement_text = []
+            if not inline_or_text or is_last_child:
+                if len(nodes_to_wrap) and text_node_inside:
+                    # create and insert new <p></p> element in right place
+                    new_paragraph = self.parser.createElement(tag='p')
+                    self.parser.addprevious(new_paragraph, kid)
 
-        for n in nodes_to_remove:
-            self.parser.remove(n)
+                    # new paragraph will produce line break, should replace <br> tag (at least first occurrence)
+                    if self.parser.getTag(kid) == 'br':
+                        self.parser.drop_tag(kid)
 
-        return nodes_to_return
+                    # append text nodes and inline elements into the paragraph element
+                    for n in nodes_to_wrap:
+                        if self.parser.isTextNode(n):
+                            if len(new_paragraph):
+                                new_paragraph[-1].tail = n.text
+                            else:
+                                new_paragraph.text = n.text
+                            # remove <text> nodes and their content
+                            self.parser.drop_tree(n)
+                        else:
+                            # lxml append method moves element from one place to another
+                            # and we dont need to remove it manually from an old place
+                            self.parser.appendChild(new_paragraph, n)
+
+                nodes_to_wrap = []
+                text_node_inside = False
+
+        return list(div)
 
     def replace_with_para(self, doc, div):
         self.parser.replaceTag(div, 'p')
@@ -224,7 +261,7 @@ class DocumentCleaner(object):
                 self.replace_with_para(doc, div)
                 bad_divs += 1
             elif div is not None:
-                replace_nodes = self.get_replacement_nodes(doc, div)
+                replace_nodes = self.get_replacement_nodes(div)
                 replace_nodes = [n for n in replace_nodes if n is not None]
                 div.clear()
                 for i, node in enumerate(replace_nodes):
