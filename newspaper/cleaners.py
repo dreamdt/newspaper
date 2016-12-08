@@ -145,15 +145,6 @@ class DocumentCleaner(object):
             self.parser.drop_tag(item)
         return doc
 
-    def clean_white_spaces(self, element):
-
-        for child in element.iter():
-            if child.text:
-                child.text = innerTrim(child.text)
-            if child.tail:
-                child.tail = innerTrim(child.tail)
-        return element
-
     def get_replacement_nodes(self, div):
         """
             Puts the content of div element (text nodes and its inline siblings) inside <p></p>
@@ -170,9 +161,6 @@ class DocumentCleaner(object):
         # set this flag, when nodes_to_wrap contains at least one text node
         text_node_inside = False
 
-        # Remove spaces to avoid empty text nodes
-        self.clean_white_spaces(div)
-
         # childNodesWithText will wrap all text nodes with <text></text> element
         kids = self.parser.childNodesWithText(div)
 
@@ -185,7 +173,12 @@ class DocumentCleaner(object):
                 nodes_to_wrap.append(kid)
 
             if not inline_or_text or is_last_child:
-                if len(nodes_to_wrap) and text_node_inside:
+                if len(nodes_to_wrap) == 1 and text_node_inside and innerTrim(nodes_to_wrap[0].text) == '':
+                    # saving white-space without creating empty <p>
+                    self.parser.addprevious(nodes_to_wrap[0], kid)
+                    # drop tag, but save text content
+                    self.parser.drop_tag(nodes_to_wrap[0])
+                elif len(nodes_to_wrap) and text_node_inside:
                     # create and insert new <p></p> element in right place
                     new_paragraph = self.parser.createElement(tag='p')
                     self.parser.addprevious(new_paragraph, kid)
