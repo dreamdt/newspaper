@@ -154,39 +154,6 @@ class DocumentCleaner(object):
                 child.tail = innerTrim(child.tail)
         return element
 
-    def get_flushed_buffer(self, replacement_text, doc):
-        return self.parser.textToPara(replacement_text)
-
-    def replace_walk_left_right(self, kid, kid_text,
-                                replacement_text, nodes_to_remove):
-        kid_text_node = kid
-        replace_text = self.tablines_replacements.replaceAll(kid_text)
-        if len(replace_text) > 1:
-            prev_node = self.parser.previousSibling(kid_text_node)
-            while prev_node is not None \
-                    and self.parser.getTag(prev_node) == "a" \
-                    and self.parser.getAttribute(
-                        prev_node, 'grv-usedalready') != 'yes':
-                outer = " " + self.parser.outerHtml(prev_node) + " "
-                replacement_text.append(outer)
-                nodes_to_remove.append(prev_node)
-                self.parser.setAttribute(prev_node, attr='grv-usedalready',
-                                         value='yes')
-                prev_node = self.parser.previousSibling(prev_node)
-
-            replacement_text.append(replace_text)
-            next_node = self.parser.nextSibling(kid_text_node)
-            while next_node is not None \
-                    and self.parser.getTag(next_node) == "a" \
-                    and self.parser.getAttribute(
-                        next_node, 'grv-usedalready') != 'yes':
-                outer = " " + self.parser.outerHtml(next_node) + " "
-                replacement_text.append(outer)
-                nodes_to_remove.append(next_node)
-                self.parser.setAttribute(next_node, attr='grv-usedalready',
-                                         value='yes')
-                next_node = self.parser.nextSibling(next_node)
-
     def get_replacement_nodes(self, div):
         """
             Puts the content of div element (text nodes and its inline siblings) inside <p></p>
