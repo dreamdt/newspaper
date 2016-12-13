@@ -66,7 +66,7 @@ class DocumentCleaner(object):
         doc_to_clean = self.remove_nodes_regex(doc_to_clean, self.twitter_re)
         doc_to_clean = self.clean_para_spans(doc_to_clean)
         doc_to_clean = self.div_to_para(doc_to_clean, 'div')
-        doc_to_clean = self.div_to_para(doc_to_clean, 'span')
+        doc_to_clean = self.span_to_para(doc_to_clean)
         return doc_to_clean
 
     def clean_body_classes(self, doc):
@@ -227,4 +227,13 @@ class DocumentCleaner(object):
                 for i, node in enumerate(replace_nodes):
                     div.insert(i, node)
                 else_divs += 1
+        return doc
+
+    def span_to_para(self, doc):
+        spans_to_ignore = self.parser.css_select(doc, 'p span')
+        spans_to_convert = self.parser.getElementsByTag(doc, tag='span')
+
+        for span in spans_to_convert:
+            if span not in spans_to_ignore:
+                self.replace_with_para(doc, span)
         return doc
