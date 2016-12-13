@@ -216,11 +216,12 @@ class DocumentCleaner(object):
         tags = ['a', 'blockquote', 'dl', 'div', 'img', 'ol', 'p',
                 'pre', 'table', 'ul']
         for div in divs:
-            items = self.parser.getElementsByTags(div, tags)
-            if div is not None and len(items) == 0:
-                self.replace_with_para(doc, div)
-                bad_divs += 1
-            elif div is not None:
+            # items = self.parser.getElementsByTags(div, tags)
+            # if div is not None and len(items) == 0:
+            #     self.replace_with_para(doc, div)
+            #     bad_divs += 1
+            # el
+            if div is not None:
                 replace_nodes = self.get_replacement_nodes(div)
                 replace_nodes = [n for n in replace_nodes if n is not None]
                 div.clear()
