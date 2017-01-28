@@ -72,6 +72,9 @@ class Configuration(object):
 
         self.thread_timeout_seconds = 1
 
+        # set True if no article text was found
+        self.skip_bad_cleaner = False
+
         # Set this to False if you want to recompute the categories
         # *every* time you build a `Source` object
         # TODO: Actually make this work

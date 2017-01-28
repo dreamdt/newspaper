@@ -55,7 +55,8 @@ class DocumentCleaner(object):
         doc_to_clean = self.clean_em_tags(doc_to_clean)
         doc_to_clean = self.remove_drop_caps(doc_to_clean)
         doc_to_clean = self.remove_scripts_styles(doc_to_clean)
-        doc_to_clean = self.clean_bad_tags(doc_to_clean)
+        if not self.config.skip_bad_cleaner:
+            doc_to_clean = self.clean_bad_tags(doc_to_clean)
         doc_to_clean = self.remove_nodes_regex(doc_to_clean, self.caption_re)
         doc_to_clean = self.remove_nodes_regex(doc_to_clean, self.google_re)
         doc_to_clean = self.remove_nodes_regex(doc_to_clean, self.entries_re)
