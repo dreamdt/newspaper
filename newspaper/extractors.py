@@ -439,12 +439,7 @@ class ContentExtractor(object):
             if not try_two:
                 try_three = self.get_meta_content(doc, 'meta[name="og:image"]')
 
-                if not try_three:
-                    link_icon_kwargs = {'tag': 'link', 'attr': 'rel', 'value': 'icon'}
-                    elems = self.parser.getElementsByTag(doc, **link_icon_kwargs)
-                    try_four = elems[0].get('href') if elems else None
-
-        top_meta_image = try_one or try_two or try_three or try_four
+        top_meta_image = try_one or try_two or try_three
 
         if top_meta_image:
             return urljoin(article_url, top_meta_image)
