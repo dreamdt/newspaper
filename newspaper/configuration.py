@@ -14,7 +14,7 @@ import logging
 
 from .parsers import Parser
 from .text import (StopWords, StopWordsArabic, StopWordsChinese,
-                   StopWordsKorean)
+                   StopWordsKorean, StopWordsPersian)
 from .version import __version__
 
 log = logging.getLogger(__name__)
@@ -108,6 +108,9 @@ class Configuration(object):
             return StopWordsChinese
         elif language == 'ar':
             return StopWordsArabic
+        elif language == 'fa':
+            return StopWordsPersian
+
         return StopWords
 
     def get_parser(self):

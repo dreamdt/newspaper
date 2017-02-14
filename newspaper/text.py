@@ -156,3 +156,20 @@ class StopWordsKorean(StopWords):
         ws.set_stopword_count(len(overlapping_stopwords))
         ws.set_stop_words(overlapping_stopwords)
         return ws
+
+
+class StopWordsPersian(StopWords):
+    """Persian segmentation
+    Stopwords https://github.com/kharazi/persian-stopwords/blob/master/persian
+    Word tokenizer https://github.com/sobhe/hazm/tree/master/hazm
+    """
+    def __init__(self, language='fa'):
+        super(StopWordsPersian, self).__init__(language='fa')
+
+    def remove_punctuation(self, content):
+        return content
+
+    def candidate_words(self, stripped_input):
+        from hazm import word_tokenize
+        words = word_tokenize(stripped_input)
+        return words
