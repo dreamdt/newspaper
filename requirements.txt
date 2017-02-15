@@ -10,4 +10,4 @@ tldextract>=1.5.1
 feedfinder2>=0.0.4
 jieba3k>=0.35.1
 python-dateutil>=2.4.0
-hazm>=0.5.2
+git+https://github.com/mercuree/hazm.git@word_tokenizer
