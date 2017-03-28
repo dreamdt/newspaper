@@ -387,8 +387,13 @@ class ContentExtractor(object):
     def get_meta_lang(self, doc):
         """Extract content language from meta
         """
-        # we have a lang attribute in html
-        attr = self.parser.getAttribute(doc, attr='lang')
+        # we have a lang attribute in html/body/title
+        lang_elements = doc.xpath('//*[self::html|self::body|self::title][@lang]')
+        if len(lang_elements):
+            attr = self.parser.getAttribute(lang_elements[0], attr='lang')
+        else:
+            attr = None
+
         if attr is None:
             # look up for a Content-Language in meta
             items = [
