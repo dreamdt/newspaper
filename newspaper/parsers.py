@@ -12,6 +12,7 @@ import lxml.html
 import lxml.html.clean
 import re
 import traceback
+import string
 from html.parser import HTMLParser
 
 from bs4 import UnicodeDammit
@@ -117,13 +118,18 @@ class Parser(object):
 
     @classmethod
     def getElementsByTag(
-            cls, node, tag=None, attr=None, value=None, childs=False):
-        NS = "http://exslt.org/regular-expressions"
+            cls, node, tag=None, attr=None, value=None, childs=False, use_regex=False):
+        NS = {"re": "http://exslt.org/regular-expressions"}
         # selector = tag or '*'
         selector = 'descendant-or-self::%s' % (tag or '*')
         if attr and value:
-            selector = '%s[re:test(@%s, "%s", "i")]' % (selector, attr, value)
-        elems = node.xpath(selector, namespaces={"re": NS})
+            if use_regex:
+                selector = '%s[re:test(@%s, "%s", "i")]' % (selector, attr, value)
+            else:
+                trans = 'translate(@%s, "%s", "%s")' % (attr, string.ascii_uppercase, string.ascii_lowercase)
+                selector = '%s[contains(%s, "%s")]' % (selector, trans, value.lower())
+                NS = {}
+        elems = node.xpath(selector, namespaces=NS)
         # remove the root node
         # if we have a selection tag
         if node in elems and (tag or childs):
