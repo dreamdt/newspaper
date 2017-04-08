@@ -8,6 +8,7 @@ import logging
 import copy
 import os
 import glob
+import langdetect
 
 from . import images
 from . import network
@@ -190,19 +191,24 @@ class Article(object):
         authors = self.extractor.get_authors(self.clean_doc)
         self.set_authors(authors)
 
+        meta_description = \
+            self.extractor.get_meta_description(self.clean_doc)
+        self.set_meta_description(meta_description)
+
         meta_lang = self.extractor.get_meta_lang(self.clean_doc)
         self.set_meta_language(meta_lang)
 
         if self.config.use_meta_language:
+            if not self.meta_lang:
+                try:
+                    self.meta_lang = langdetect.detect(self.title + ' ' + self.meta_description)
+                except:
+                    pass
             self.extractor.update_language(self.meta_lang)
             output_formatter.update_language(self.meta_lang)
 
         meta_favicon = self.extractor.get_favicon(self.clean_doc)
         self.set_meta_favicon(meta_favicon)
-
-        meta_description = \
-            self.extractor.get_meta_description(self.clean_doc)
-        self.set_meta_description(meta_description)
 
         canonical_link = self.extractor.get_canonical_link(
             self.url, self.clean_doc)
