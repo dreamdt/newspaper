@@ -199,9 +199,11 @@ class Article(object):
         self.set_meta_language(meta_lang)
 
         if self.config.use_meta_language:
-            if not self.meta_lang:
+            if not meta_lang:
                 try:
-                    self.meta_lang = langdetect.detect(self.title + ' ' + self.meta_description)
+                    self.set_meta_language(
+                        langdetect.detect(self.title + ' ' + self.meta_description)
+                    )
                 except:
                     pass
             self.extractor.update_language(self.meta_lang)
