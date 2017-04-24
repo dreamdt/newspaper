@@ -265,13 +265,13 @@ class Article(object):
                 imgs.add(self.meta_img)
             self.set_imgs(imgs)
 
-        if self.clean_top_node is not None and not self.has_top_image():
-            first_img = self.extractor.get_first_img_url(
-                self.url, self.clean_top_node)
-            self.set_top_img(first_img)
-
-        if not self.has_top_image():
-            self.set_reddit_top_img()
+        # if self.clean_top_node is not None and not self.has_top_image():
+        #     first_img = self.extractor.get_first_img_url(
+        #         self.url, self.clean_top_node)
+        #     self.set_top_img(first_img)
+        #
+        # if not self.has_top_image():
+        #     self.set_reddit_top_img()
 
     def has_top_image(self):
         return self.top_img is not None and self.top_img != ''
