@@ -232,7 +232,7 @@ class DocumentCleaner(object):
 
     def span_to_para(self, doc):
         spans_to_ignore = self.parser.css_select(doc, 'p span')
-        spans_to_convert = self.parser.getElementsByTag(doc, tag='span')
+        spans_to_convert = doc.xpath('.//*[self::div|self::article]/span')
 
         for span in spans_to_convert:
             if span not in spans_to_ignore:
