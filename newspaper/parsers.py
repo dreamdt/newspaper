@@ -11,9 +11,8 @@ import lxml.etree
 import lxml.html
 import lxml.html.clean
 import re
-import traceback
 import string
-from html.parser import HTMLParser
+from html import unescape
 
 from bs4 import UnicodeDammit
 from copy import deepcopy
@@ -77,7 +76,7 @@ class Parser(object):
             cls.doc = lxml.html.fromstring(html)
             return cls.doc
         except Exception:
-            traceback.print_exc()
+            log.warn('fromstring() returned an invalid string: %s...', html[:20])
             return
 
     @classmethod
@@ -266,7 +265,7 @@ class Parser(object):
         if attr:
             attr = node.attrib.get(attr, None)
         if attr:
-            attr = HTMLParser().unescape(attr)
+            attr = unescape(attr)
         return attr
 
     @classmethod
