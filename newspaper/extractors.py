@@ -910,9 +910,7 @@ class ContentExtractor(object):
                         score = float(baseline_score_siblings_para *
                                       sibling_baseline_score)
                         if score < paragraph_score and not high_link_density:
-                            p = self.parser.createElement(
-                                tag='p', text=text, tail=None)
-                            ps.append(p)
+                            ps.append(first_paragraph)
                 return ps
 
     def get_siblings_score(self, top_node):
