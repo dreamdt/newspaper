@@ -376,7 +376,8 @@ def print_available_languages():
         'vi': 'Vietnamese',
         'mk': 'Macedonian',
         'tr': 'Turkish',
-        'el': 'Greek'
+        'el': 'Greek',
+        'cs': 'Czech'
     }
 
     codes = get_available_languages()
