@@ -214,6 +214,8 @@ class ContentExtractor(object):
              'content': 'content'},
             {'attribute': 'name', 'value': 'PublishDate',
              'content': 'content'},
+            {'attribute': 'pubdate', 'value': 'pubdate',
+             'content': 'datetime'},
         ]
         for known_meta_tag in PUBLISH_DATE_TAGS:
             meta_tags = self.parser.getElementsByTag(
@@ -283,7 +285,7 @@ class ContentExtractor(object):
 
         # create filtered versions of title_text, title_text_h1, title_text_fb
         # for finer comparison
-        filter_regex = re.compile(r'[^a-zA-Z0-9\ ]')
+        filter_regex = re.compile(r'[^\u4e00-\u9fa5a-zA-Z0-9\ ]')
         filter_title_text = filter_regex.sub('', title_text).lower()
         filter_title_text_h1 = filter_regex.sub('', title_text_h1).lower()
         filter_title_text_fb = filter_regex.sub('', title_text_fb).lower()
@@ -503,7 +505,7 @@ class ContentExtractor(object):
             key_head = key.pop(0)
             ref = data[key_head]
 
-            if isinstance(ref, str):
+            if isinstance(ref, str) or isinstance(ref, int):
                 data[key_head] = {key_head: ref}
                 ref = data[key_head]
 
@@ -513,7 +515,7 @@ class ContentExtractor(object):
                     break
                 if not ref.get(part):
                     ref[part] = dict()
-                elif isinstance(ref.get(part), str):
+                elif isinstance(ref.get(part), str) or isinstance(ref.get(part), int):
                     # Not clear what to do in this scenario,
                     # it's not always a URL, but an ID of some sort
                     ref[part] = {'identifier': ref[part]}
