@@ -191,20 +191,10 @@ class Parser(object):
 
     @classmethod
     def remove(cls, node):
-        parent = node.getparent()
-        if parent is not None:
-            if node.tail:
-                prev = node.getprevious()
-                if prev is None:
-                    if not parent.text:
-                        parent.text = ''
-                    parent.text += ' ' + node.tail
-                else:
-                    if not prev.tail:
-                        prev.tail = ''
-                    prev.tail += ' ' + node.tail
-            node.clear()
-            parent.remove(node)
+        try:
+            node.drop_tree()
+        except AssertionError:
+            pass
 
     @classmethod
     def getTag(cls, node):
