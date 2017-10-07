@@ -11,8 +11,8 @@ import lxml.etree
 import lxml.html
 import lxml.html.clean
 import re
-import string
 from html import unescape
+import string
 
 from bs4 import UnicodeDammit
 from copy import deepcopy
@@ -117,7 +117,7 @@ class Parser(object):
 
     @classmethod
     def getElementsByTag(
-            cls, node, tag=None, attr=None, value=None, childs=False, use_regex=False):
+            cls, node, tag=None, attr=None, value=None, childs=False, use_regex=False) -> list:
         NS = None
         # selector = tag or '*'
         selector = 'descendant-or-self::%s' % (tag or '*')

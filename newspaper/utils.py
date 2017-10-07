@@ -379,7 +379,8 @@ def print_available_languages():
         'tr': 'Turkish',
         'el': 'Greek',
         'cs': 'Czech',
-        'uk': 'Ukrainian'
+        'uk': 'Ukrainian',
+        'hi': 'Hindi'
     }
 
     codes = get_available_languages()

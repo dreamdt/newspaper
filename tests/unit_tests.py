@@ -385,6 +385,7 @@ class ContentExtractorTestCase(unittest.TestCase):
             '<meta name="og:image" />'
         html_rel_img_src = html_empty_all + '<link rel="img_src" href="https://example.com/meta_link_image.jpg" />'
         html_rel_img_src2 = html_empty_all + '<link rel="image_src" href="https://example.com/meta_link_image2.jpg" />'
+        html_rel_icon = html_empty_all + '<link rel="icon" href="https://example.com/meta_link_rel_icon.ico" />'
 
         doc = self.parser.fromstring(html)
         self.assertEqual(
@@ -410,6 +411,11 @@ class ContentExtractorTestCase(unittest.TestCase):
         self.assertEqual(
             self.extractor.get_meta_img_url('http://www.example.com/article?foo=bar', doc),
             'https://example.com/meta_link_image2.jpg'
+        )
+        doc = self.parser.fromstring(html_rel_icon)
+        self.assertEqual(
+            self.extractor.get_meta_img_url('http://www.example.com/article?foo=bar', doc),
+            'https://example.com/meta_link_rel_icon.ico'
         )
 
 
@@ -649,6 +655,12 @@ class MultiLanguageTestCase(unittest.TestCase):
         text = mock_resource_with('spanish', 'txt')
         self.assertEqual(text, article.text)
         self.assertEqual(text, fulltext(article.html, 'es'))
+
+
+class TestNewspaperLanguagesApi(unittest.TestCase):
+    @print_test
+    def test_languages_api_call(self):
+        newspaper.languages()
 
 
 if __name__ == '__main__':
