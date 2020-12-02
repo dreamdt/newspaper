@@ -185,10 +185,14 @@ class Article(object):
         self.set_html(html)
         self.set_title(title)
 
-    def parse(self):
+    def parse(self, parsed_doc=None):
         self.throw_if_not_downloaded_verbose()
 
-        self.doc = self.config.get_parser().fromstring(self.html)
+        if parsed_doc:
+            self.doc = parsed_doc
+        else:
+            self.doc = self.config.get_parser().fromstring(self.html)
+
         self.clean_doc = copy.deepcopy(self.doc)
 
         if self.doc is None:
